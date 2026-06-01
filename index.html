@@ -819,16 +819,29 @@
   }
   .act-btn:active { background: rgba(200,149,42,0.4); transform: scale(0.9); }
   @media (max-width: 768px) {
-  /* Hide the redundant skill bar on mobile to clear the screen */
+  /* 1. Hide redundant bar */
   .skill-bar { display: none !important; }
 
-  /* Move the minimap to the top-right corner to clear the joystick area */
+  /* 2. Fix Top Header Overlap */
+  .hud-top-center {
+    position: fixed;
+    top: 40px; /* Push below the vitality/stealth bars */
+    left: 0;
+    right: 0;
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+  #contractBanner {
+    top: 90px; /* Push the contract banner down so it doesn't hit the gold/souls */
+  }
+
+  /* 3. Minimap placement */
   .minimap-container {
     position: fixed;
-    top: 70px; /* Below the contract banner */
+    top: 80px;
     left: 8px;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
   }
 }
 </style>
