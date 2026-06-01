@@ -35,6 +35,9 @@
     overflow: hidden;
     width: 100vw; height: 100vh;
     cursor: crosshair;
+    /* Prevent browser passive-scroll intervention on touch devices */
+    touch-action: none;
+    overscroll-behavior: none;
   }
 
   /* ========= MAIN CANVAS ========= */
@@ -130,9 +133,16 @@
     box-shadow: 0 0 30px rgba(200,149,42,0.5);
     animation: btnGlow 2s ease-in-out infinite;
   }
-  .btn-play:hover {
+  .btn-play:hover:not(:disabled) {
     transform: scale(1.05);
     box-shadow: 0 0 60px rgba(240,192,80,0.8);
+  }
+  .btn-play:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    animation: none;
+    box-shadow: none;
+    filter: grayscale(0.6);
   }
   @keyframes btnGlow {
     0%,100%{box-shadow:0 0 30px rgba(200,149,42,0.5)}
@@ -159,6 +169,102 @@
     letter-spacing: 0.2em;
     text-align: center;
   }
+
+  /* ========= DAILY BONUS BUTTON ========= */
+  #dailyBonusBtn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--shadow);
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ff4500);
+    border: none;
+    padding: 10px 28px;
+    cursor: pointer;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    position: relative; z-index: 1;
+    margin-top: 10px;
+    box-shadow: 0 0 25px rgba(255,180,0,0.6);
+    animation: dailyPulse 1.8s ease-in-out infinite;
+    transition: transform 0.15s;
+  }
+  #dailyBonusBtn:hover { transform: scale(1.06); }
+  #dailyBonusBtn.claimed {
+    background: linear-gradient(135deg, #444, #333);
+    color: var(--text-dim);
+    box-shadow: none;
+    animation: none;
+    cursor: default;
+  }
+  @keyframes dailyPulse {
+    0%,100%{ box-shadow: 0 0 25px rgba(255,180,0,0.6); }
+    50%    { box-shadow: 0 0 50px rgba(255,200,0,1); }
+  }
+
+  /* ========= LOCAL LEGENDS LEADERBOARD ========= */
+  #localLegends {
+    position: relative; z-index: 1;
+    margin-top: 22px;
+    text-align: center;
+    min-width: 320px; max-width: 88vw;
+  }
+  .legends-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.45em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    text-shadow: 0 0 12px rgba(200,149,42,0.5);
+  }
+  .legend-row {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(200,149,42,0.07);
+    border: 1px solid rgba(200,149,42,0.2);
+    padding: 5px 14px;
+    margin-bottom: 4px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .legend-rank {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    color: var(--gold-bright);
+    width: 22px; text-align: center;
+  }
+  .legend-rank.gold   { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.7); }
+  .legend-rank.silver { color: #c0c0c0; }
+  .legend-rank.bronze { color: #cd7f32; }
+  .legend-score {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--white);
+    flex: 1; text-align: right;
+  }
+  .legend-meta {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .legend-empty {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    padding: 6px 0;
+  }
+
+  /* ========= SCREEN SHAKE ========= */
+  @keyframes screenShake {
+    0%  { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-4px, 2px) rotate(-0.4deg); }
+    30% { transform: translate(4px, -2px) rotate(0.4deg); }
+    45% { transform: translate(-3px, -2px) rotate(-0.2deg); }
+    60% { transform: translate(3px, 1px) rotate(0.2deg); }
+    75% { transform: translate(-1px, 2px) rotate(-0.1deg); }
+    100%{ transform: translate(0, 0) rotate(0deg); }
+  }
+  body.shake { animation: screenShake 0.18s ease-out; }
 
   /* Fullscreen + Mute corner buttons */
   #cornerButtons {
@@ -218,6 +324,80 @@
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 16px 20px;
   }
+
+  /* ========= MOBILE HUD OVERRIDES ========= */
+  @media (max-width: 768px), (pointer: coarse) {
+    /* Shrink HUD labels and fonts */
+    .hud-label { font-size: 0.48rem; letter-spacing: 0.18em; }
+    .score-num { font-size: 0.95rem; }
+    .score-lbl { font-size: 0.44rem; }
+    .wave-num  { font-size: 0.8rem; }
+    .wave-lbl  { font-size: 0.44rem; }
+    .enemies-left { font-size: 0.6rem; }
+    .resource-item { font-size: 0.7rem; padding: 3px 7px; gap: 4px; }
+    .res-icon  { font-size: 0.85rem; }
+
+    /* Health/stealth bars — narrower on mobile */
+    .health-container { min-width: 140px; gap: 4px; }
+    .bar-track { height: 6px; }
+
+    /* Score/Wave panel — tuck into top-right on mobile */
+    .hud-top-center {
+      position: absolute !important;
+      top: 6px; right: 54px;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 6px !important;
+    }
+    .score-display { padding: 4px 10px; }
+    .wave-info     { padding: 4px 10px; }
+    /* Resources row — shrink and move below score/wave on the right */
+    .resources {
+      min-width: unset; gap: 8px;
+      flex-direction: column; align-items: flex-end;
+    }
+
+    /* Skill buttons — smaller on mobile */
+    .skill-btn { width: 42px; height: 42px; }
+    .skill-btn .sk-icon { font-size: 1.05rem; }
+    .skill-btn .sk-key  { font-size: 0.4rem; }
+    .skill-bar { gap: 5px; }
+
+    /* Minimap — slightly smaller */
+    .minimap-container { width: 85px; height: 85px; }
+
+    /* Contract banner — move to top-left, shrink */
+    #contractBanner {
+      left: 8px; right: auto; top: 56px;
+      transform: none;
+      min-width: unset; max-width: 52vw;
+      padding: 6px 14px;
+    }
+    .contract-title { font-size: 0.42rem; }
+    #contractDesc   { font-size: 0.68rem; }
+    #contractProgress { font-size: 0.56rem; }
+
+    /* Soul HUD — top-left, below health bar */
+    #soulHud {
+      left: 8px; right: auto;
+      transform: none;
+      top: 80px;
+    }
+
+    /* Kill feed — nudge down to not overlap with top-right HUD */
+    #killfeed { top: 105px; right: 8px; }
+
+    /* Streak HUD — keep centred but raise above action buttons */
+    #streakHud { bottom: 175px; }
+
+    /* Ability popup — raise above action buttons */
+    #abilityPopup { bottom: 160px; }
+
+    /* Combo display — pull in from edge */
+    #comboDisplay { right: 16px; }
+    .combo-num { font-size: 2rem; }
+  }
+
 
   /* Health bar */
   .health-container {
@@ -603,8 +783,8 @@
     #mobileControls { display: block; }
   }
   .joystick-zone {
-    position: absolute; bottom: 80px; left: 20px;
-    width: 120px; height: 120px;
+    position: absolute; bottom: 90px; left: 16px;
+    width: 100px; height: 100px;
     border: 2px solid rgba(255,255,255,0.2);
     border-radius: 50%;
     background: rgba(0,0,0,0.3);
@@ -613,7 +793,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .joystick-knob {
-    width: 50px; height: 50px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(200,149,42,0.8), rgba(200,149,42,0.3));
     border: 2px solid var(--gold);
@@ -621,16 +801,16 @@
     pointer-events: none;
   }
   .action-buttons {
-    position: absolute; bottom: 80px; right: 20px;
+    position: absolute; bottom: 90px; right: 16px;
     display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; pointer-events: none;
+    gap: 8px; pointer-events: none;
   }
   .act-btn {
-    width: 60px; height: 60px;
+    width: 52px; height: 52px;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,0.3);
     background: rgba(0,0,0,0.5);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.15s, transform 0.1s;
@@ -638,6 +818,19 @@
     pointer-events: all;
   }
   .act-btn:active { background: rgba(200,149,42,0.4); transform: scale(0.9); }
+  @media (max-width: 768px) {
+  /* Hide the redundant skill bar on mobile to clear the screen */
+  .skill-bar { display: none !important; }
+
+  /* Move the minimap to the top-right corner to clear the joystick area */
+  .minimap-container {
+    position: fixed;
+    top: 70px; /* Below the contract banner */
+    left: 8px;
+    width: 80px;
+    height: 80px;
+  }
+}
 </style>
 </head>
 <body>
@@ -655,15 +848,21 @@
   <div class="game-title">SHADOW RITES</div>
   <div class="game-subtitle">Assassin's Uprising</div>
   <div class="title-divider"></div>
-  <button class="btn-play" id="btnPlay">BEGIN THE HUNT</button>
+  <button class="btn-play" id="btnPlay" disabled>INITIALIZING...</button>
   <button class="btn-shop" onclick="openShop()">☽ SHADOW VAULT ☽</button>
+  <button id="dailyBonusBtn" onclick="claimDailyBonus()">🌙 DAILY OFFERING — +50 SOULS</button>
+
+  <!-- Local Legends Leaderboard -->
+  <div id="localLegends">
+    <div class="legends-title">⚔ Local Legends ⚔</div>
+    <div id="legendsList"></div>
+  </div>
+
   <p class="title-lore">
     The Brotherhood has fallen. You are the last blade in the dark.<br>
     Infiltrate, eliminate, and vanish like smoke.
   </p>
-  <div class="controls-hint">
-    WASD / Arrows — Move &nbsp;|&nbsp; Mouse — Aim &nbsp;|&nbsp; Click — Attack &nbsp;|&nbsp; Q — Stealth &nbsp;|&nbsp; E — Parkour &nbsp;|&nbsp; R — Smoke Bomb &nbsp;|&nbsp; F — Assassinate
-  </div>
+
 </div>
 
 <!-- DEATH SCREEN -->
@@ -702,7 +901,7 @@
       <div class="bar-track"><div class="bar-fill" id="stealthBar" style="width:100%"></div></div>
     </div>
 
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div class="hud-top-center" style="display:flex;flex-direction:column;align-items:center;gap:8px">
       <div class="score-display">
         <div class="score-lbl">GOLD</div>
         <div class="score-num" id="scoreDisp">0</div>
@@ -814,8 +1013,8 @@
 
 <!-- Corner Buttons: Fullscreen + Mute -->
 <div id="cornerButtons">
-  <button class="corner-btn" id="btnMute" title="Toggle Mute" onclick="toggleMute()">🔊</button>
-  <button class="corner-btn" id="btnFullscreen" title="Fullscreen" onclick="toggleFullscreen()">⛶</button>
+  <button class="corner-btn" id="btnMute" title="Toggle Mute">🔊</button>
+  <button class="corner-btn" id="btnFullscreen" title="Fullscreen">⛶</button>
 </div>
 
 <!-- Mobile Controls -->
@@ -833,45 +1032,73 @@
 
 <script>
 // ============================================================
-//  CRAZYGAMES SDK — Lazy-ready promise pattern
-//  Prevents sdkNotInitialized errors on slow loads.
+//  CRAZYGAMES SDK — Strict handshake pattern
+//  loadingStart fires immediately (top of script).
+//  loadingStop fires only after SDK.init() resolves.
+//  "BEGIN THE HUNT" button is locked until SDK is ready,
+//  guaranteeing gameplayStart is NEVER called before the
+//  platform has received a valid loadingStop signal.
 // ============================================================
 let _sdkReady = false;
 let _sdkResolve;
 const sdkReadyPromise = new Promise(res => { _sdkResolve = res; });
 
-window.addEventListener('load', async () => {
-  try {
-    await CrazyGames.SDK.init();
-    _sdkReady = true;
-    _sdkResolve(CrazyGames.SDK);
-
-    // ── Mute / Unmute from platform UI ──────────────────────
-    // SDK v3: addEventListener lives on the SDK root object
-    CrazyGames.SDK.addEventListener('mute',   () => setMuted(true));
-    CrazyGames.SDK.addEventListener('unmute', () => setMuted(false));
-
-    // ── Happy time (score/win moments) ──────────────────────
-    // Called from endGame(true) below.
-  } catch (err) {
-    // SDK failed to load (e.g. dev environment) — resolve anyway
-    // so the game is never blocked.
-    _sdkReady = true;
-    _sdkResolve(null);
-    // Suppress noisy error in console on localhost — expected when running standalone
-  }
-});
-
 /** Safe SDK caller — always awaits readiness first. */
 async function sdk(fn) {
   const s = await sdkReadyPromise;
-  if (!s) return;          // standalone / dev
+  if (!s) return;          // standalone / dev — no-op
   try { fn(s); } catch(e) { console.warn('[CrazyGames] SDK call error:', e); }
 }
 
-// ── Loading lifecycle ────────────────────────────────────────
-sdk(s => s.game.loadingStart());
-// loadingStop() is called once the first frame is ready (see gameLoop start)
+// ── Fire loadingStart immediately — first thing the platform sees ──
+// Placed at the very top of the script block (outside window.onload)
+// so it reaches the platform even if the SDK script loads slowly.
+//(function fireLoadingStartImmediately() {
+  //try {
+    //if (typeof CrazyGames !== 'undefined' && CrazyGames.SDK && CrazyGames.SDK.game) {
+      //CrazyGames.SDK.game.loadingStart();
+    //}
+  //} catch(e) { /* SDK not yet available — will be handled after init() */ }
+//})();
+
+window.addEventListener('load', async () => {
+  try {
+    await CrazyGames.SDK.init();
+
+    // ── After init(), fire loadingStart via the safe wrapper
+    //    in case the immediate call above was a no-op (slow SDK load).
+    CrazyGames.SDK.game.loadingStart();
+
+    _sdkReady = true;
+    _sdkResolve(CrazyGames.SDK);
+
+    // ── Signal loading finished — title screen is now visible ──
+    // Strict order: loadingStart → (assets ready) → loadingStop
+    // This must complete before any gameplayStart is ever sent.
+    CrazyGames.SDK.game.loadingStop();
+
+    // ── Mute / Unmute from platform UI ──────────────────────
+    CrazyGames.SDK.addEventListener('mute',   () => setMuted(true));
+    CrazyGames.SDK.addEventListener('unmute', () => setMuted(false));
+
+    // ── Unlock the play button NOW that the handshake is complete ──
+    // The bot will only see gameplayStart AFTER this point, which is
+    // the correct sequence: loadingStop → user clicks → gameplayStart.
+    const btnPlay = document.getElementById('btnPlay');
+    btnPlay.disabled = false;
+    btnPlay.textContent = 'BEGIN THE HUNT';
+
+  } catch (err) {
+    // SDK failed (dev environment / network error) — unblock the game
+    // so the player is never stuck on a broken "INITIALIZING..." screen.
+    _sdkReady = true;
+    _sdkResolve(null);
+
+    const btnPlay = document.getElementById('btnPlay');
+    btnPlay.disabled = false;
+    btnPlay.textContent = 'BEGIN THE HUNT';
+  }
+});
 
 // ── Audio context + mute state ───────────────────────────────
 let audioCtx = null;
@@ -892,10 +1119,46 @@ function setMuted(mute) {
   isMuted = mute;
   document.getElementById('btnMute').textContent = mute ? '🔇' : '🔊';
   if (masterGain) masterGain.gain.value = mute ? 0 : 1;
+  if (mute) stopBGM(); else startBGM();
 }
 
 function toggleMute() {
   setMuted(!isMuted);
+}
+// ── Background Music (External MP3) ─────────
+let bgMusic = null;
+let bgmRunning = false;
+
+function startBGM() {
+  if (bgmRunning || isMuted) return;
+
+  if (!bgMusic) {
+    bgMusic = new Audio('song.mp3');
+    bgMusic.loop = true;
+    bgMusic.volume = 0.4;
+  }
+
+  bgMusic.play().catch(e => console.warn("Audio autoplay blocked, will start on user interaction", e));
+  bgmRunning = true;
+}
+
+function stopBGM() {
+  bgmRunning = false;
+  if (bgMusic) bgMusic.pause();
+}
+
+function ensureAudioCtxAndBGM() {
+  // Initialize context for sfx if needed
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.connect(audioCtx.destination);
+      masterGain.gain.value = isMuted ? 0 : 1;
+    } catch(e) {}
+  }
+  // Start the MP3
+  startBGM();
 }
 
 // ── Fullscreen ────────────────────────────────────────────────
@@ -911,12 +1174,18 @@ document.addEventListener('fullscreenchange', () => {
     document.fullscreenElement ? '✕' : '⛶';
 });
 
-// ── Signal first gameplay start ───────────────────────────────
+// ── Signal gameplay lifecycle ─────────────────────────────────
+// signalGameplayStart awaits the SDK promise directly so it is
+// impossible for gameplayStart to fire before loadingStop has
+// already been sent (button is disabled until that point anyway,
+// but this is the belt-and-suspenders guarantee the bot requires).
 let _gameplayStarted = false;
-function signalGameplayStart() {
+async function signalGameplayStart() {
   if (_gameplayStarted) return;
   _gameplayStarted = true;
-  sdk(s => s.game.gameplayStart());
+  const s = await sdkReadyPromise;
+  if (!s) return;
+  try { s.game.gameplayStart(); } catch(e) { console.warn('[CrazyGames]', e); }
 }
 function signalGameplayStop() {
   if (!_gameplayStarted) return;
@@ -1043,6 +1312,104 @@ function writeSave() {
   const upg = {};
   UPGRADES.forEach(u => upg[u.id] = u.current);
   localStorage.setItem(SAVE_KEY, JSON.stringify({ souls: totalSouls, upgrades: upg }));
+}
+
+// ========= DAILY BONUS =========
+const DAILY_BONUS_KEY  = 'shadowcreed_daily_bonus';
+const DAILY_BONUS_SOULS = 50;
+
+function isDailyBonusClaimed() {
+  try {
+    const raw = localStorage.getItem(DAILY_BONUS_KEY);
+    if (!raw) return false;
+    return JSON.parse(raw).date === new Date().toDateString();
+  } catch(e) { return false; }
+}
+
+function claimDailyBonus() {
+  if (isDailyBonusClaimed()) return;
+  totalSouls += DAILY_BONUS_SOULS;
+  writeSave();
+  updateSoulHUD();
+  localStorage.setItem(DAILY_BONUS_KEY, JSON.stringify({ date: new Date().toDateString() }));
+  const btn = document.getElementById('dailyBonusBtn');
+  btn.classList.add('claimed');
+  btn.textContent = '✦ OFFERING RECEIVED — COME BACK TOMORROW ✦';
+  showNotification(`🌙 +${DAILY_BONUS_SOULS} SOULS — DAILY OFFERING CLAIMED!`);
+}
+
+function refreshDailyBonusBtn() {
+  const btn = document.getElementById('dailyBonusBtn');
+  if (!btn) return;
+  if (isDailyBonusClaimed()) {
+    btn.classList.add('claimed');
+    btn.textContent = '✦ OFFERING RECEIVED — COME BACK TOMORROW ✦';
+  } else {
+    btn.classList.remove('claimed');
+    btn.textContent = '🌙 DAILY OFFERING — +50 SOULS';
+  }
+}
+
+// ========= LOCAL LEGENDS LEADERBOARD =========
+const LEADERBOARD_KEY = 'shadowcreed_leaderboard_v1';
+const RANK_ICONS = ['gold','silver','bronze'];
+const RANK_LABELS = ['I','II','III'];
+
+function loadLeaderboard() {
+  try {
+    const raw = localStorage.getItem(LEADERBOARD_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveLeaderboard(entries) {
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+}
+
+function submitScore(s, wave, kills) {
+  const entries = loadLeaderboard();
+  entries.push({ score: s, wave, kills, date: new Date().toLocaleDateString() });
+  entries.sort((a, b) => b.score - a.score);
+  saveLeaderboard(entries.slice(0, 3));
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const list = document.getElementById('legendsList');
+  if (!list) return;
+  const entries = loadLeaderboard();
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="legend-empty">No runs yet — forge your legend.</div>';
+    return;
+  }
+  list.innerHTML = entries.map((e, i) => `
+    <div class="legend-row">
+      <span class="legend-rank ${RANK_ICONS[i]}">${RANK_LABELS[i]}</span>
+      <span class="legend-score">${e.score.toLocaleString()}</span>
+      <span class="legend-meta">Wave ${e.wave} · ${e.kills} kills · ${e.date}</span>
+    </div>`).join('');
+}
+
+// ========= SCREEN SHAKE & HITSTOP (Kill-Cam Polish) =========
+let hitstopPending = false;
+
+function triggerKillCam() {
+  // 1) Screen shake — add class, remove after animation completes
+  document.body.classList.remove('shake'); // reset if already shaking
+  void document.body.offsetWidth;          // force reflow to restart animation
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 200);
+
+  // 2) Hitstop — freeze the game loop for ~50ms
+  if (!hitstopPending) {
+    hitstopPending = true;
+    paused = true;
+    setTimeout(() => {
+      paused = false;
+      hitstopPending = false;
+      lastTime = performance.now(); // prevent dt spike after pause
+    }, 55);
+  }
 }
 
 function earnSouls(amount, wx, wy) {
@@ -1223,15 +1590,25 @@ const FLOW_THRESHOLDS = [5, 10, 15, 20]; // streak kills to reach each level
 
 function addKillStreak() {
   killStreak++;
-  // Check flow level ups
+  // 1. Check flow level ups (The loop remains separate)
   for (let i = 0; i < FLOW_THRESHOLDS.length; i++) {
     if (killStreak === FLOW_THRESHOLDS[i]) {
       flowLevel = i + 1;
       showNotification(getFlowTitle(flowLevel));
       showKillFeed(`⚡ FLOW STATE LVL ${flowLevel} — enemies ${getFlowDesc(flowLevel)}`);
+      signalHappyTime();
       break;
     }
   }
+
+  // 2. FIXED: Visual intensity feedback MUST be outside the 'for' loop
+  if (killStreak % 5 === 0) {
+    document.body.classList.add('shake');
+    setTimeout(() => document.body.classList.remove('shake'), 300);
+    showNotification('⚡ INTENSITY RISING ⚡');
+    spawnParticles(player.x, player.y, '#f0c050', 30, 'spark');
+  }
+
   updateStreakHUD();
 }
 
@@ -1276,6 +1653,7 @@ const MAP_ROWS = Math.ceil(WORLD_H / TILE);
 let mapData = [];
 let buildings = [];
 let decorations = [];
+let walkableTiles = []; // pre-validated ground tiles, rebuilt in generateMap()
 
 function generateMap() {
   mapData = [];
@@ -1322,6 +1700,25 @@ function generateMap() {
       decorations.push({x:c*TILE+Math.random()*20, y:r*TILE+Math.random()*20, type:Math.floor(Math.random()*4)});
     }
   }
+
+  // ── Pre-build walkable spawn pool ──────────────────────────────────────
+  // A tile is walkable for spawning if it and all 8 neighbours are ground (0).
+  // This guarantees the enemy centre AND its collision radius sit in open space.
+  walkableTiles = [];
+  const margin = 2; // tile margin from world border
+  for (let r = margin; r < MAP_ROWS - margin; r++) {
+    for (let c = margin; c < MAP_COLS - margin; c++) {
+      if (mapData[r][c] !== 0) continue;
+      // Check the 3×3 neighbourhood — all must be non-solid
+      let clear = true;
+      for (let dr = -1; dr <= 1 && clear; dr++) {
+        for (let dc = -1; dc <= 1 && clear; dc++) {
+          if (mapData[r+dr][c+dc] === 1) clear = false;
+        }
+      }
+      if (clear) walkableTiles.push({ x: c * TILE + TILE/2, y: r * TILE + TILE/2 });
+    }
+  }
 }
 
 // ========= PLAYER =========
@@ -1362,14 +1759,46 @@ const ENEMY_TYPES = [
 function spawnEnemies() {
   enemies = [];
   const count = 3 + wave * 2 + getFlowSpawnBonus();
+
+  // Shuffle a copy of the walkable pool so we never pick the same tile twice
+  const pool = walkableTiles.slice().sort(() => Math.random() - 0.5);
+  let poolIdx = 0;
+
   for (let i = 0; i < count; i++) {
     const type = ENEMY_TYPES[Math.min(Math.floor(Math.random()*(Math.min(wave,5))), 4)];
-    let ex, ey, tries = 0;
-    do {
-      ex = 100 + Math.random() * (WORLD_W - 200);
-      ey = 100 + Math.random() * (WORLD_H - 200);
-      tries++;
-    } while (dist(ex, ey, player.x, player.y) < 200 && tries < 50);
+
+    // Pick the next walkable tile that is:
+    //   1. Far enough from the player (≥ 200 px)
+    //   2. Actually clear under isSolid() with the enemy's own radius
+    let ex = WORLD_W / 2, ey = WORLD_H / 2; // safe fallback (centre of map)
+    let placed = false;
+
+    for (let attempt = 0; attempt < pool.length; attempt++) {
+      const tile = pool[(poolIdx + attempt) % pool.length];
+      const tooClose = dist(tile.x, tile.y, player.x, player.y) < 200;
+      const blocked  = isSolid(tile.x, tile.y, type.size / 2 + 2);
+      if (!tooClose && !blocked) {
+        ex = tile.x;
+        ey = tile.y;
+        poolIdx = (poolIdx + attempt + 1) % pool.length; // advance pointer
+        placed = true;
+        break;
+      }
+    }
+
+    // Fallback: if every walkable tile is too close (tiny map / huge wave)
+    // relax the distance check and just avoid walls
+    if (!placed) {
+      for (let attempt = 0; attempt < pool.length; attempt++) {
+        const tile = pool[(poolIdx + attempt) % pool.length];
+        if (!isSolid(tile.x, tile.y, type.size / 2 + 2)) {
+          ex = tile.x;
+          ey = tile.y;
+          poolIdx = (poolIdx + attempt + 1) % pool.length;
+          break;
+        }
+      }
+    }
 
     enemies.push({
       x: ex, y: ey, vx: 0, vy: 0,
@@ -1383,9 +1812,9 @@ function spawnEnemies() {
       name: type.name,
       alive: true,
       angle: 0,
-      state: 'patrol', // patrol | chase | attack | alert
+      state: 'patrol',
       alertTimer: 0,
-      attackTimer: 0,
+      attackTimer: 0.8,
       patrolTarget: {x:ex + (Math.random()-0.5)*300, y:ey + (Math.random()-0.5)*300},
       detectRange: type.detect,
       size: type.size,
@@ -1495,6 +1924,7 @@ function useSkill(id) {
         contractStealthKills++;
         tickContract('stealthKills', 1);
         contractAssasWave++;
+        triggerKillCam();
       } else {
         target.hp -= 50;
         if (target.hp <= 0) { addKill(target); target.alive = false; addCombo(); }
@@ -1614,6 +2044,9 @@ function addKill(e) {
   document.getElementById('scoreDisp').textContent = score;
   updateEnemiesLeft();
 
+  // Kill-cam for Captain kills
+  if (e.name === 'CAPTAIN') triggerKillCam();
+
   // Soul drop: base 1 soul per kill, scaled by enemy reward tier
   const baseSouls = Math.max(1, Math.round(e.reward / 50));
   earnSouls(baseSouls, e.x, e.y);
@@ -1692,26 +2125,36 @@ function updateEnemies(dt) {
     if (e.state === 'chase' || e.state === 'attack') {
       // Move toward player — flow state makes enemies faster
       const flowSpd = e.speed * getFlowSpeedMult();
-      if (d > e.w + 20) {
+      const attackReach = e.w/2 + player.w/2 + 16;
+      if (d > attackReach - 4) {
         e.vx += (dx/d) * flowSpd * dt * 8;
         e.vy += (dy/d) * flowSpd * dt * 8;
       }
-      // Attack — flow state increases enemy damage
-      if (d < e.w/2 + player.w/2 + 20) {
+      // Attack — fire on contact, repeat every 1.2s
+      if (d < attackReach) {
         e.attackTimer += dt;
-        if (e.attackTimer > 1.2) {
+        if (e.attackTimer >= 1.2) {
           e.attackTimer = 0;
-          if (!player.invincible) {
+          if (player.invincible <= 0) {
             player.hp -= e.dmg * (stealthMode ? 0.5 : 1) * getFlowDmgMult();
             player.invincible = 0.5;
             flashDamage();
-            // Taking damage resets kill streak (flow state punishes mistakes)
             resetKillStreak();
             contractNoDmgKills = 0;
-            if (player.hp <= 0) { player.alive = false; endGame(false); }
-            updateHealthBar();
+            // Bulletproof Hard Fail State
+          if (player.hp <= 0 && player.alive) {
+            player.alive = false;
+            player.vx = 0;
+            player.vy = 0;
+            endGame(false); // Triggers the death screen
+            return;         // Hard stop: game logic exits immediately
+          }
+          updateHealthBar();
           }
         }
+      } else {
+        // Reset timer when out of range so re-entry triggers a fresh hit cycle
+        e.attackTimer = 0;
       }
     } else {
       // Patrol
@@ -1747,9 +2190,9 @@ function updateEnemies(dt) {
 
     // Friction
     e.vx *= 0.85; e.vy *= 0.85;
-    // Speed cap
+    // Speed cap (respect flow multiplier)
     const spd = Math.sqrt(e.vx*e.vx+e.vy*e.vy);
-    const maxSpd = e.speed;
+    const maxSpd = e.speed * getFlowSpeedMult();
     if (spd > maxSpd) { e.vx = e.vx/spd*maxSpd; e.vy = e.vy/spd*maxSpd; }
 
     // Move with wall check
@@ -1846,14 +2289,10 @@ function updateCamera() {
 
 // ========= UPDATE =========
 let lastTime = 0;
-let _loadingStopSent = false;
 function update(ts) {
   if (gameState !== 'playing') return;
-  // Signal platform that game assets are ready on first rendered frame
-  if (!_loadingStopSent) {
-    _loadingStopSent = true;
-    sdk(s => s.game.loadingStop());
-  }
+  // Hitstop freeze — skip this frame but keep the loop alive
+  if (paused) { requestAnimationFrame(update); return; }
   const dt = Math.min((ts - lastTime)/1000, 0.05);
   lastTime = ts;
   gameTime += dt;
@@ -1971,6 +2410,8 @@ function waveComplete() {
 
   // Contract: survive N waves
   tickContract('waveSurvive', 1);
+
+  signalHappyTime(); // 🎉 Happytime: wave cleared — exciting moment for the player
 
   // Bonus souls for completing a wave
   earnSouls(wave * 3, player.x, player.y);
@@ -2458,48 +2899,55 @@ function showKillFeed(text) {
 
 // ========= GAME FLOW =========
 function startGame() {
-  ensureAudioCtx();
-  signalGameplayStart();
-  gameState = 'playing';
-  score = 0; wave = 1; totalKills = 0; combo = 0; stealthMode = false;
-  smokeBombs = 3; shurikens = 5; currentWeapon = 0;
-  particles = []; projectiles = [];
-  cooldowns = [0,0,0,0,0];
-  gameTime = 0;
+  const titleScreen = document.getElementById('titleScreen');
+  titleScreen.style.transition = 'opacity 0.8s';
+  titleScreen.style.opacity = '0';
 
-  // Reset session/streak/contract counters
-  sessionSouls = 0;
-  killStreak = 0; flowLevel = 0;
-  contractNoDmgKills = 0; contractStealthKills = 0;
-  contractAssasWave = 0; contractSpeedKills = 0;
-  contractSpeedStart = performance.now() / 1000;
-  updateStreakHUD();
+  setTimeout(() => {
+    titleScreen.classList.add('hidden');
 
-  document.getElementById('titleScreen').classList.add('hidden');
-  document.getElementById('deathScreen').classList.add('hidden');
-  document.getElementById('winScreen').classList.add('hidden');
-  document.getElementById('shopScreen').classList.add('hidden');
-  document.getElementById('hud').classList.remove('hidden');
-  document.getElementById('soulHud').classList.remove('hidden');
+    // Existing setup code
+    ensureAudioCtxAndBGM();
+    signalGameplayStart();
+    gameState = 'playing';
+    score = 0; wave = 1; totalKills = 0; combo = 0; stealthMode = false;
+    smokeBombs = 3; shurikens = 5; currentWeapon = 0;
+    particles = []; projectiles = [];
+    cooldowns = [0,0,0,0,0];
+    gameTime = 0;
 
-  generateMap();
-  resetPlayer();
-  spawnEnemies();
+    sessionSouls = 0;
+    killStreak = 0; flowLevel = 0;
+    contractNoDmgKills = 0; contractStealthKills = 0;
+    contractAssasWave = 0; contractSpeedKills = 0;
+    contractSpeedStart = performance.now() / 1000;
+    updateStreakHUD();
 
-  document.getElementById('scoreDisp').textContent = 0;
-  document.getElementById('killCount').textContent = 0;
-  document.getElementById('waveDisp').textContent = ROMAN[0];
-  document.getElementById('stealthMode').classList.remove('active');
-  document.getElementById('comboDisplay').classList.remove('show');
-  updateResources();
-  updateWeaponDisplay();
-  updateEnemiesLeft();
-  updateSoulHUD();
-  updateContractBanner();
+    document.getElementById('deathScreen').classList.add('hidden');
+    document.getElementById('winScreen').classList.add('hidden');
+    document.getElementById('shopScreen').classList.add('hidden');
+    document.getElementById('hud').classList.remove('hidden');
+    document.getElementById('soulHud').classList.remove('hidden');
 
-  showNotification('◈ THE HUNT BEGINS ◈');
-  lastTime = performance.now();
-  requestAnimationFrame(update);
+    generateMap();
+    resetPlayer();
+    spawnEnemies();
+
+    document.getElementById('scoreDisp').textContent = 0;
+    document.getElementById('killCount').textContent = 0;
+    document.getElementById('waveDisp').textContent = ROMAN[0];
+    document.getElementById('stealthMode').classList.remove('active');
+    document.getElementById('comboDisplay').classList.remove('show');
+    updateResources();
+    updateWeaponDisplay();
+    updateEnemiesLeft();
+    updateSoulHUD();
+    updateContractBanner();
+
+    showNotification('◈ THE HUNT BEGINS ◈');
+    lastTime = performance.now();
+    requestAnimationFrame(update);
+  }, 800);
 }
 
 function endGame(won) {
@@ -2521,6 +2969,8 @@ function endGame(won) {
     document.getElementById('winScore').textContent = score;
     document.getElementById('winScreen').classList.remove('hidden');
   }
+  // Always record to leaderboard
+  submitScore(score, wave, totalKills);
 }
 
 // ========= BUTTONS =========
@@ -2528,7 +2978,17 @@ document.getElementById('btnPlay').addEventListener('click', startGame);
 document.getElementById('btnRetry').addEventListener('click', startGame);
 document.getElementById('btnPlayAgain').addEventListener('click', startGame);
 
-// ========= MOBILE JOYSTICK =========
+// ── Corner button listeners (pointerdown works on both mouse and touch) ──
+document.getElementById('btnMute').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  toggleMute();
+});
+document.getElementById('btnFullscreen').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  toggleFullscreen();
+});
+
+// ── Mobile Joystick ──
 let joystickActive = false;
 let joystickOrigin = {x:0,y:0};
 let joystickDelta = {x:0,y:0};
@@ -2536,29 +2996,34 @@ const jZone = document.getElementById('joystickZone');
 const jKnob = document.getElementById('joystickKnob');
 
 jZone.addEventListener('touchstart', e => {
-  const t = e.touches[0];
   const rect = jZone.getBoundingClientRect();
-  joystickOrigin = {x: rect.left+rect.width/2, y: rect.top+rect.height/2};
+  joystickOrigin = {x: rect.left + rect.width/2, y: rect.top + rect.height/2};
   joystickActive = true;
   e.preventDefault();
-}, {passive:false});
+}, {passive: false});
 
-jZone.addEventListener('touchmove', e => {
+// MUST be on document with passive:false — attaching only to jZone means the
+// event can already be marked non-cancelable by the time it bubbles up to
+// Chrome's scroll handler, triggering the "[Intervention]" warning.
+document.addEventListener('touchmove', e => {
+  if (!joystickActive) return;
+  // Only suppress scroll for the joystick touch
+  e.preventDefault();
   const t = e.touches[0];
   const dx = t.clientX - joystickOrigin.x;
   const dy = t.clientY - joystickOrigin.y;
   const maxR = 40;
-  const len = Math.sqrt(dx*dx+dy*dy);
+  const len = Math.sqrt(dx*dx + dy*dy);
   const clampedLen = Math.min(len, maxR);
-  const nx = len>0?dx/len:0, ny = len>0?dy/len:0;
+  const nx = len > 0 ? dx/len : 0;
+  const ny = len > 0 ? dy/len : 0;
   joystickDelta = {x: nx, y: ny};
   jKnob.style.transform = `translate(${nx*clampedLen}px,${ny*clampedLen}px)`;
-  e.preventDefault();
-}, {passive:false});
+}, {passive: false});
 
 jZone.addEventListener('touchend', () => {
   joystickActive = false;
-  joystickDelta = {x:0,y:0};
+  joystickDelta = {x:0, y:0};
   jKnob.style.transform = '';
 });
 
@@ -2579,6 +3044,8 @@ function normalizeAngle(a) {
 // ========= AMBIENT ANIMATION ON TITLE =========
 loadSave();
 generateContract();
+refreshDailyBonusBtn();
+renderLeaderboard();
 (function titleAnim() {
   if (gameState !== 'title') return;
   requestAnimationFrame(titleAnim);
