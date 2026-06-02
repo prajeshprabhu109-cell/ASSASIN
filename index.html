@@ -364,12 +364,12 @@
     .skill-bar { gap: 5px; }
 
     /* Minimap — slightly smaller */
-    .minimap-container { width: 85px; height: 85px; }
+    .minimap-container { width: 70px; height: 70px; }
 
-    /* Contract banner — move to top-left, shrink */
+    /* Contract banner — keep centred, below top HUD row */
     #contractBanner {
-      left: 8px; right: auto; top: 56px;
-      transform: none;
+      left: 50%; right: auto; top: 56px;
+      transform: translateX(-50%);
       min-width: unset; max-width: 52vw;
       padding: 6px 14px;
     }
@@ -377,11 +377,11 @@
     #contractDesc   { font-size: 0.68rem; }
     #contractProgress { font-size: 0.56rem; }
 
-    /* Soul HUD — top-left, below health bar */
+    /* Soul HUD — top-left, below minimap */
     #soulHud {
       left: 8px; right: auto;
       transform: none;
-      top: 80px;
+      top: 148px;
     }
 
     /* Kill feed — nudge down to not overlap with top-right HUD */
@@ -783,7 +783,7 @@
     #mobileControls { display: block; }
   }
   .joystick-zone {
-    position: absolute; bottom: 90px; left: 16px;
+    position: absolute; bottom: 24px; left: 12px;
     width: 100px; height: 100px;
     border: 2px solid rgba(255,255,255,0.2);
     border-radius: 50%;
@@ -801,7 +801,7 @@
     pointer-events: none;
   }
   .action-buttons {
-    position: absolute; bottom: 90px; right: 16px;
+    position: absolute; bottom: 110px; right: 10px;
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 8px; pointer-events: none;
   }
@@ -832,16 +832,19 @@
     justify-content: center !important;
   }
   #contractBanner {
-    top: 90px; /* Push the contract banner down so it doesn't hit the gold/souls */
+    top: 68px; /* Aligned with minimap top */
+    left: 86px; /* Clear of the 70px minimap + 8px offset */
+    right: auto;
+    transform: none;
   }
 
-  /* 3. Minimap placement */
+  /* 3. Minimap placement — top-left corner, below health bars, clear of joystick */
   .minimap-container {
     position: fixed;
-    top: 80px;
+    top: 68px;
     left: 8px;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
   }
 }
 </style>
