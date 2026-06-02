@@ -825,14 +825,14 @@
   /* 2. Fix Top Header Overlap */
   .hud-top-center {
     position: fixed;
-    top: 40px; /* Push below the vitality/stealth bars */
+    top: 40px;
     left: 0;
     right: 0;
     flex-direction: row !important;
     justify-content: center !important;
   }
   #contractBanner {
-    top: 90px; /* Push the contract banner down so it doesn't hit the gold/souls */
+    top: 90px;
   }
 
   /* 3. Minimap placement */
@@ -845,32 +845,176 @@
   }
 }
 
-  /* ========= LANDSCAPE MOBILE — fix joystick/minimap overlap ========= */
+  /* =====================================================
+     LANDSCAPE MOBILE — complete layout fix
+     Targets phones in landscape: short viewport, wide screen
+     ===================================================== */
   @media (max-height: 500px) and (orientation: landscape) {
-    /* Minimap: snap to top-left corner, out of joystick territory */
+
+    /* ── TITLE SCREEN: two-column layout ── */
+    #titleScreen {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 24px !important;
+      padding: 12px 20px !important;
+      overflow-y: auto !important;
+    }
+
+    /* Left column: emblem + title stacked */
+    .title-emblem {
+      width: 56px !important;
+      height: 56px !important;
+      margin-bottom: 6px !important;
+      flex-shrink: 0 !important;
+    }
+    .game-title {
+      font-size: clamp(1.1rem, 4vw, 2rem) !important;
+      letter-spacing: 0.05em !important;
+    }
+    .game-subtitle {
+      font-size: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+      letter-spacing: 0.3em !important;
+      margin-top: 4px !important;
+    }
+    .title-divider {
+      margin: 8px 0 !important;
+      width: 100% !important;
+    }
+
+    /* Hide lore text and leaderboard in landscape — not enough height */
+    .title-lore    { display: none !important; }
+    #localLegends  { display: none !important; }
+
+    /* Buttons: compact */
+    .btn-play {
+      padding: 10px 28px !important;
+      font-size: 0.85rem !important;
+    }
+    .btn-shop {
+      padding: 7px 20px !important;
+      font-size: 0.72rem !important;
+      margin-top: 6px !important;
+    }
+    #dailyBonusBtn {
+      padding: 7px 20px !important;
+      font-size: 0.7rem !important;
+      margin-top: 6px !important;
+    }
+
+    /* ── GAMEPLAY HUD ── */
+
+    /* Hide desktop skill bar (already hidden at max-width:768px but coarse pointer may miss it) */
+    .skill-bar { display: none !important; }
+
+    /* Health/stealth bars — compact, stay top-left */
+    .health-container {
+      min-width: 110px !important;
+      gap: 2px !important;
+    }
+    .bar-track  { height: 5px !important; }
+    .hud-label  { font-size: 0.42rem !important; }
+    .hud-top    { padding: 6px 10px !important; }
+
+    /* Score/Wave/Enemies — top-right row */
+    .hud-top-center {
+      position: absolute !important;
+      top: 4px !important;
+      right: 80px !important;
+      left: auto !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 4px !important;
+    }
+    .score-display { padding: 3px 8px !important; }
+    .wave-info     { padding: 3px 8px !important; }
+    .score-num     { font-size: 0.8rem !important; }
+    .score-lbl, .wave-lbl { font-size: 0.38rem !important; }
+    .wave-num      { font-size: 0.7rem !important; }
+    .enemies-left  { font-size: 0.5rem !important; }
+
+    /* Resources — compact column, top-right */
+    .resources {
+      min-width: unset !important;
+      gap: 4px !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+    }
+    .resource-item { font-size: 0.6rem !important; padding: 2px 5px !important; gap: 3px !important; }
+    .res-icon      { font-size: 0.75rem !important; }
+
+    /* Minimap — top-left, BELOW the vitality/stealth bars (bars ≈ 55px tall in landscape) */
     .minimap-container {
       position: fixed !important;
-      top: 8px !important;
+      top: 58px !important;
       left: 8px !important;
       width: 70px !important;
       height: 70px !important;
     }
 
-    /* Joystick: anchor to bottom-left, no conflict with minimap above */
+    /* Joystick — bottom-left, clear of skill bar (skill bar is hidden) */
     .joystick-zone {
-      bottom: 12px !important;
+      bottom: 10px !important;
       left: 16px !important;
+      width: 88px !important;
+      height: 88px !important;
+    }
+    .joystick-knob {
+      width: 34px !important;
+      height: 34px !important;
     }
 
-    /* Action buttons: mirror joystick on the bottom-right */
+    /* Action buttons — bottom-right */
     .action-buttons {
-      bottom: 12px !important;
+      bottom: 10px !important;
       right: 16px !important;
+      gap: 6px !important;
+    }
+    .act-btn {
+      width: 44px !important;
+      height: 44px !important;
+      font-size: 1rem !important;
     }
 
-    /* Raise streak/popup above the joystick (100px tall + 12px bottom gap) */
-    #streakHud    { bottom: 130px !important; }
-    #abilityPopup { bottom: 130px !important; }
+    /* Contract banner — smaller, centred */
+    #contractBanner {
+      top: 6px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      min-width: unset !important;
+      max-width: 44vw !important;
+      padding: 4px 12px !important;
+    }
+    .contract-title   { font-size: 0.38rem !important; }
+    #contractDesc     { font-size: 0.6rem !important; }
+    #contractProgress { font-size: 0.5rem !important; }
+
+    /* Soul HUD — top-left, below minimap */
+    #soulHud {
+      left: 8px !important;
+      right: auto !important;
+      transform: none !important;
+      top: 134px !important;
+    }
+
+    /* Kill feed — nudge in */
+    #killfeed { top: 50px !important; right: 8px !important; }
+
+    /* Streak & ability popups — raise above joystick */
+    #streakHud    { bottom: 110px !important; }
+    #abilityPopup { bottom: 110px !important; }
+
+    /* Combo — pull in */
+    #comboDisplay { right: 12px !important; }
+    .combo-num    { font-size: 1.5rem !important; }
+
+    /* Weapon label — tuck above action buttons */
+    .hud-bottom > div:last-child {
+      position: fixed !important;
+      bottom: 106px !important;
+      right: 16px !important;
+      width: auto !important;
+    }
   }
 </style>
 </head>
