@@ -364,12 +364,12 @@
     .skill-bar { gap: 5px; }
 
     /* Minimap — slightly smaller */
-    .minimap-container { width: 70px; height: 70px; }
+    .minimap-container { width: 85px; height: 85px; }
 
-    /* Contract banner — keep centred, below top HUD row */
+    /* Contract banner — move to top-left, shrink */
     #contractBanner {
-      left: 50%; right: auto; top: 56px;
-      transform: translateX(-50%);
+      left: 8px; right: auto; top: 56px;
+      transform: none;
       min-width: unset; max-width: 52vw;
       padding: 6px 14px;
     }
@@ -377,11 +377,11 @@
     #contractDesc   { font-size: 0.68rem; }
     #contractProgress { font-size: 0.56rem; }
 
-    /* Soul HUD — top-left, below minimap */
+    /* Soul HUD — top-left, below health bar */
     #soulHud {
       left: 8px; right: auto;
       transform: none;
-      top: 148px;
+      top: 80px;
     }
 
     /* Kill feed — nudge down to not overlap with top-right HUD */
@@ -783,7 +783,7 @@
     #mobileControls { display: block; }
   }
   .joystick-zone {
-    position: absolute; bottom: 24px; left: 12px;
+    position: absolute; bottom: 90px; left: 16px;
     width: 100px; height: 100px;
     border: 2px solid rgba(255,255,255,0.2);
     border-radius: 50%;
@@ -801,7 +801,7 @@
     pointer-events: none;
   }
   .action-buttons {
-    position: absolute; bottom: 110px; right: 10px;
+    position: absolute; bottom: 90px; right: 16px;
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 8px; pointer-events: none;
   }
@@ -832,21 +832,46 @@
     justify-content: center !important;
   }
   #contractBanner {
-    top: 68px; /* Aligned with minimap top */
-    left: 86px; /* Clear of the 70px minimap + 8px offset */
-    right: auto;
-    transform: none;
+    top: 90px; /* Push the contract banner down so it doesn't hit the gold/souls */
   }
 
-  /* 3. Minimap placement — top-left corner, below health bars, clear of joystick */
+  /* 3. Minimap placement */
   .minimap-container {
     position: fixed;
-    top: 68px;
+    top: 80px;
     left: 8px;
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
   }
 }
+
+  /* ========= LANDSCAPE MOBILE — fix joystick/minimap overlap ========= */
+  @media (max-height: 500px) and (orientation: landscape) {
+    /* Minimap: snap to top-left corner, out of joystick territory */
+    .minimap-container {
+      position: fixed !important;
+      top: 8px !important;
+      left: 8px !important;
+      width: 70px !important;
+      height: 70px !important;
+    }
+
+    /* Joystick: anchor to bottom-left, no conflict with minimap above */
+    .joystick-zone {
+      bottom: 12px !important;
+      left: 16px !important;
+    }
+
+    /* Action buttons: mirror joystick on the bottom-right */
+    .action-buttons {
+      bottom: 12px !important;
+      right: 16px !important;
+    }
+
+    /* Raise streak/popup above the joystick (100px tall + 12px bottom gap) */
+    #streakHud    { bottom: 130px !important; }
+    #abilityPopup { bottom: 130px !important; }
+  }
 </style>
 </head>
 <body>
