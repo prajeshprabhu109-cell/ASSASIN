@@ -266,24 +266,40 @@
   }
   body.shake { animation: screenShake 0.18s ease-out; }
 
-  /* Fullscreen + Mute corner buttons */
+  /* ========= CORNER BUTTONS (Mute + Fullscreen) =========
+     Desktop: fixed top-right corner, clear of HUD.
+     Mobile:  part of the unified safe-zone top bar.
+     Minimum 44×44 px touch targets per CrazyGames guidelines.
+  ========================================================= */
   #cornerButtons {
-    position: fixed; top: 12px; right: 12px;
-    display: flex; gap: 8px; z-index: 300;
+    position: fixed;
+    top: 8px; right: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    z-index: 300;
     pointer-events: all;
+    /* Align buttons to the right edge — no overlap with left/center HUD */
+    align-items: center;
+    justify-content: flex-end;
   }
   .corner-btn {
-    width: 36px; height: 36px;
+    /* CrazyGames requirement: min 44×44 px touch targets */
+    width: 44px; height: 44px;
     background: var(--ui-bg);
     border: 1px solid rgba(200,149,42,0.35);
     color: var(--text);
-    font-size: 1rem;
+    font-size: 1.1rem;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: border-color 0.15s, background 0.15s;
-    clip-path: polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+    clip-path: polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+    /* Prevent text selection on tap */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .corner-btn:hover { border-color: var(--gold); background: rgba(200,149,42,0.2); }
+  .corner-btn:hover  { border-color: var(--gold); background: rgba(200,149,42,0.2); }
+  .corner-btn:active { background: rgba(200,149,42,0.35); }
 
   /* DEATH SCREEN */
   #deathScreen {
@@ -323,11 +339,16 @@
     position: absolute; top: 0; left: 0; right: 0;
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 16px 20px;
+    /* Reserve right-side space for the two corner buttons (2×44 + 8px gap + 8px outer) = 104px */
+    padding-right: 108px;
   }
 
-  /* ========= MOBILE HUD OVERRIDES ========= */
+  /* ========= MOBILE HUD OVERRIDES =========
+     Safe-zone layout: elements are flex-anchored to viewport corners.
+     No element overlaps another. All touch targets ≥ 44×44 px.
+  ========================================================= */
   @media (max-width: 768px), (pointer: coarse) {
-    /* Shrink HUD labels and fonts */
+    /* ── Top-left: vitality / stealth bars ── */
     .hud-label { font-size: 0.48rem; letter-spacing: 0.18em; }
     .score-num { font-size: 0.95rem; }
     .score-lbl { font-size: 0.44rem; }
@@ -336,39 +357,58 @@
     .enemies-left { font-size: 0.6rem; }
     .resource-item { font-size: 0.7rem; padding: 3px 7px; gap: 4px; }
     .res-icon  { font-size: 0.85rem; }
-
-    /* Health/stealth bars — narrower on mobile */
     .health-container { min-width: 140px; gap: 4px; }
     .bar-track { height: 6px; }
 
-    /* Score/Wave panel — tuck into top-right on mobile */
+    /* ── Top-right safe zone: corner buttons + score/wave ──
+       Corner buttons sit at fixed top-right with enough right-padding
+       so the score/wave panel can sit just to their left without collision.
+    */
+    #cornerButtons {
+      top: 6px;
+      right: 6px;
+      gap: 4px;
+    }
+
+    /* Score/Wave: anchored left of the corner buttons.
+       We use right offset = button_count×(44px+4px gap) + 6px outer = ~98px */
     .hud-top-center {
-      position: absolute !important;
-      top: 6px; right: 54px;
+      position: fixed !important;
+      top: 6px;
+      right: 98px;          /* sits directly left of the two 44px corner buttons */
+      left: auto !important;
       flex-direction: row !important;
       align-items: center !important;
-      gap: 6px !important;
+      gap: 5px !important;
     }
     .score-display { padding: 4px 10px; }
     .wave-info     { padding: 4px 10px; }
-    /* Resources row — shrink and move below score/wave on the right */
+
+    /* Resources: anchored top-right, below the corner buttons / score row */
     .resources {
-      min-width: unset; gap: 8px;
-      flex-direction: column; align-items: flex-end;
+      position: fixed !important;
+      top: 56px;             /* below the 44px button + 6px top + 6px gap */
+      right: 6px;
+      left: auto !important;
+      min-width: unset;
+      gap: 5px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
     }
 
-    /* Skill buttons — smaller on mobile */
-    .skill-btn { width: 42px; height: 42px; }
+    /* Skill buttons */
+    .skill-btn { width: 44px; height: 44px; }
     .skill-btn .sk-icon { font-size: 1.05rem; }
     .skill-btn .sk-key  { font-size: 0.4rem; }
     .skill-bar { gap: 5px; }
 
-    /* Minimap — slightly smaller */
+    /* Minimap */
     .minimap-container { width: 85px; height: 85px; }
 
-    /* Contract banner — move to top-left, shrink */
+    /* Contract banner — top-left, below health bars */
     #contractBanner {
-      left: 8px; right: auto; top: 56px;
+      left: 8px; right: auto; top: 72px;
       transform: none;
       min-width: unset; max-width: 52vw;
       padding: 6px 14px;
@@ -377,23 +417,23 @@
     #contractDesc   { font-size: 0.68rem; }
     #contractProgress { font-size: 0.56rem; }
 
-    /* Soul HUD — top-left, below health bar */
+    /* Soul HUD — top-left, below contract banner */
     #soulHud {
       left: 8px; right: auto;
       transform: none;
-      top: 80px;
+      top: 118px;
     }
 
-    /* Kill feed — nudge down to not overlap with top-right HUD */
-    #killfeed { top: 105px; right: 8px; }
+    /* Kill feed — below resources row on the right */
+    #killfeed { top: 100px; right: 8px; }
 
-    /* Streak HUD — keep centred but raise above action buttons */
+    /* Streak HUD — above action buttons */
     #streakHud { bottom: 175px; }
 
-    /* Ability popup — raise above action buttons */
+    /* Ability popup — above action buttons */
     #abilityPopup { bottom: 160px; }
 
-    /* Combo display — pull in from edge */
+    /* Combo display */
     #comboDisplay { right: 16px; }
     .combo-num { font-size: 2rem; }
   }
@@ -819,31 +859,34 @@
   }
   .act-btn:active { background: rgba(200,149,42,0.4); transform: scale(0.9); }
   @media (max-width: 768px) {
-  /* 1. Hide redundant bar */
-  .skill-bar { display: none !important; }
+    /* Hide redundant desktop skill bar */
+    .skill-bar { display: none !important; }
 
-  /* 2. Fix Top Header Overlap */
-  .hud-top-center {
-    position: fixed;
-    top: 40px;
-    left: 0;
-    right: 0;
-    flex-direction: row !important;
-    justify-content: center !important;
-  }
-  #contractBanner {
-    top: 90px;
-  }
+    /* Score/wave panel: sit left of corner buttons (2×44 + gap + padding ≈ 100px) */
+    .hud-top-center {
+      position: fixed !important;
+      top: 6px !important;
+      right: 98px !important;
+      left: auto !important;
+      flex-direction: row !important;
+      justify-content: flex-end !important;
+      align-items: center !important;
+    }
 
-  /* 3. Minimap placement */
-  .minimap-container {
-    position: fixed;
-    top: 80px;
-    left: 8px;
-    width: 60px;
-    height: 60px;
+    /* Contract banner: below health bars, clear of score panel */
+    #contractBanner {
+      top: 72px !important;
+    }
+
+    /* Minimap: top-left, below health bars */
+    .minimap-container {
+      position: fixed !important;
+      top: 80px !important;
+      left: 8px !important;
+      width: 65px !important;
+      height: 65px !important;
+    }
   }
-}
 
   /* =====================================================
      LANDSCAPE MOBILE — complete layout fix
@@ -916,11 +959,11 @@
     .hud-label  { font-size: 0.42rem !important; }
     .hud-top    { padding: 6px 10px !important; }
 
-    /* Score/Wave/Enemies — top-right row */
+    /* Score/Wave/Enemies — top-right, left of corner buttons */
     .hud-top-center {
-      position: absolute !important;
+      position: fixed !important;
       top: 4px !important;
-      right: 80px !important;
+      right: 98px !important;   /* clear of 2×44px corner buttons */
       left: auto !important;
       flex-direction: row !important;
       align-items: center !important;
